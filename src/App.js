@@ -5,8 +5,8 @@ import SearchBar from './Components/SearchBar';
 import { debounce } from 'lodash';
 import request from 'superagent';
 
-const apiKey = "cM40Seb69SOprZxpStT5UCZHJWTz4kBz";
-const trendingGifs = `http://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=16`;
+const apiKey = process.env.REACT_APP_API_KEY;
+const trendingGifs = 'http://api.giphy.com/v1/gifs/trending?api_key=' + apiKey + '&limit=16';
 
 
 class App extends Component {
