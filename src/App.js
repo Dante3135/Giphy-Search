@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import GifContainer from './Components/GifContainer';
+import SearchBar from './Components/SearchBar';
+import { debounce } from 'lodash';
+import request from 'superagent';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const apiKey = "cM40Seb69SOprZxpStT5UCZHJWTz4kBz";
+const trendingGifs = `http://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=16`;
+
+
+class App extends Component {
+
+  constructor() {
+    super();
+
+    this.state = {
+      gifs: [],
+    }
+
+    this.handleTermChange = this.handleTermChange.bind(this);
+}
+
+componentDidMount() {
+  request.get(trendingGifs, (err, result) => {
+    this.setState({ gifs: result.body.data })
+  });
+
+}
+
+  handleTermChange(searchTerm){
+
+
+    const urlString = `http://api.giphy.com/v1/gifs/search?q=${searchTerm.replace(/\s/g, '+')}&api_key=${apiKey}&limit=16`;
+
+
+     if (searchTerm.length !== 0) {
+      
+       request.get(urlString, (err, result) => {
+         this.setState({ gifs: result.body.data })
+       });
+     } else {
+       request.get(trendingGifs, (err, result) => {
+         this.setState({ gifs: result.body.data })
+       });
+     }
+
+  }
+
+  render() {
+    return (
+      <div> 
+        <div className = "App-header">
+          <h2>Gif Search</h2>
+        </div>
+      <SearchBar style={{fontSize: 24, width: "40%", paddingTop: 8, paddingBottom: 8, paddingLeft: 10}} onTermChange={debounce(this.handleTermChange, 1000)} />
+      <GifContainer gifs={this.state.gifs} />
+      </div>
+      
+    );
+  }
 }
 
 export default App;
